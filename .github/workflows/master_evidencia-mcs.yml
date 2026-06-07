@@ -59,15 +59,6 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_F77C16B8E3874CD988E72AD2BC15145E }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_04BD741628AF4958B0F7DD89C0B2725C }}
 
-      - name: Get resource group and set document root
-        run: |
-          RG=$(az webapp show --name evidencia-mcs --query resourceGroup -o tsv)
-          echo "RG=$RG" >> $GITHUB_ENV
-          az webapp config set --resource-group "$RG" --name evidencia-mcs --startup-file "startup.sh" 2>&1 || echo "Startup file set failed, trying resource update"
-          az resource update --resource-group "$RG" --name evidencia-mcs \
-            --resource-type "Microsoft.Web/sites" \
-            --set properties.siteConfig.virtualApplications[0]="{\"virtualPath\":\"/\",\"physicalPath\":\"site\\\\wwwroot\\\\public\",\"preloadEnabled\":false}" 2>&1 || true
-
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
