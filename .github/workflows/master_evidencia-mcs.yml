@@ -60,6 +60,13 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_F77C16B8E3874CD988E72AD2BC15145E }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_04BD741628AF4958B0F7DD89C0B2725C }}
 
+      - name: Set document root to public/ for Laravel
+        run: |
+          RG=$(az webapp show --name evidencia-mcs --query resourceGroup -o tsv)
+          echo "Resource group: $RG"
+          az resource update --resource-group "$RG" --name evidencia-mcs --resource-type "Microsoft.Web/sites" \
+            --set properties.siteConfig.virtualApplications[0]="{\"virtualPath\":\"/\",\"physicalPath\":\"site/wwwroot/public\",\"preloadEnabled\":false}"
+
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
