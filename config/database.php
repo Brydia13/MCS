@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 use Illuminate\Support\Str;
 use Pdo\Mysql;
@@ -134,12 +134,9 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Redis Databases
     |--------------------------------------------------------------------------
     |
-    | Redis is an open source, fast, and advanced key-value store that also
     | provides a richer body of commands than a typical key-value system
-    | such as Memcached. You may define your connection settings here.
     |
     */
 
