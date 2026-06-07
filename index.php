@@ -1,7 +1,8 @@
 <?php
 $uri = urldecode(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
-$publicPath = __DIR__ . '/public' . $uri;
 
+// Static files from public/
+$publicPath = __DIR__ . '/public' . $uri;
 if ($uri !== '/' && file_exists($publicPath) && !is_dir($publicPath)) {
     $extToMime = [
         'css' => 'text/css',
@@ -27,4 +28,12 @@ if ($uri !== '/' && file_exists($publicPath) && !is_dir($publicPath)) {
     return;
 }
 
-require __DIR__ . '/public/index.php';
+// Bootstrap Laravel from public/index.php
+$laravelPublicIndex = __DIR__ . '/public/index.php';
+if (!file_exists($laravelPublicIndex)) {
+    http_response_code(500);
+    echo 'Laravel front controller not found at: ' . $laravelPublicIndex;
+    exit(1);
+}
+
+require $laravelPublicIndex;

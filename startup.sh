@@ -1,16 +1,19 @@
 #!/bin/bash
-# Laravel startup script for Azure Linux App Service
-# This runs before the container starts
+# Configure nginx for Laravel on Azure Linux App Service
 
-# Ensure the nginx document root points to public/
-if [ -d "/home/site/wwwroot/public" ]; then
-  # Remove default index.html if present
-  rm -f /home/site/wwwroot/index.html
+NGINX_CONF="/etc/nginx/sites-available/default.conf"
 
-  # Restart nginx to pick up the correct root
-  service nginx restart 2>/dev/null || true
+if [ -f "$NGINX_CONF" ]; then
+    # Set document root to public/
+    sed -i 's|root /home/site/wwwroot;|root /home/site/wwwroot/public;|g' "$NGINX_CONF"
+    
+    # Add try_files for URL rewriting in the location / block
+    if ! grep -q "try_files" "$NGINX_CONF"; then
+        sed -i '/location \/ {/a\        try_files $uri $uri/ /index.php?$query_string;' "$NGINX_CONF"
+    fi
+    
+    service nginx restart 2>/dev/null || nginx -s reload 2>/dev/null || true
 fi
 
 # Run Laravel migrations
-cd /home/site/wwwroot
-php artisan migrate --force 2>/dev/null || true
+cd /home/site/wwwroot && php artisan migrate --force 2>/dev/null || true
